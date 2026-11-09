@@ -1,0 +1,16 @@
+centro-plus.ru {
+	root * /var/www/centro-plus
+	encode zstd gzip
+	file_server
+	@assets path /img/* /css/* /js/*
+	header @assets Cache-Control "public, max-age=2592000"
+	handle_errors {
+		@notfound expression {err.status_code} == 404
+		rewrite @notfound /404.html
+		file_server
+	}
+}
+
+www.centro-plus.ru {
+	redir https://centro-plus.ru{uri} permanent
+}
