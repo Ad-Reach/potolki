@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-# Runs ON the VDS. Only swaps the site files; Caddy config is managed by hand.
+# Runs ON the VDS as user deploy: switches the "current" symlink to the uploaded release.
+# Caddy serves /srv/centro-plus/current (config: deploy/Caddyfile.snippet, set up by root once).
 set -euo pipefail
-WEBROOT="/var/www/centro-plus"
-NEW="$WEBROOT.new"
+BASE=/srv/centro-plus
+REL="$1"
 
-[ -d "$NEW" ] || { echo "no new release uploaded"; exit 1; }
-rm -rf "$WEBROOT.old"
-[ -d "$WEBROOT" ] && mv "$WEBROOT" "$WEBROOT.old"
-mv "$NEW" "$WEBROOT"
-rm -rf "$WEBROOT.old"
-chmod -R a+rX "$WEBROOT"
-echo "[deploy] $(find "$WEBROOT" -type f | wc -l) files published to $WEBROOT"
+[ -d "$BASE/releases/$REL" ] || { echo "no release $REL uploaded"; exit 1; }
+chmod -R a+rX "$BASE/releases/$REL"
+ln -sfn "releases/$REL" "$BASE/current.tmp" && mv -Tf "$BASE/current.tmp" "$BASE/current"
+ls -1dt "$BASE"/releases/* | tail -n +4 | xargs -r rm -rf   # keep 3 releases
+echo "[deploy] $(find "$BASE/current/" -type f | wc -l) files published from release $REL"

@@ -9,6 +9,9 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
+env:
+  HOST: 31.77.10.198
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,22 +22,24 @@ jobs:
       - name: Build site
         run: python3 build.py
 
-      - name: Install sshpass
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+      - name: Configure SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          cp deploy/known_hosts ~/.ssh/known_hosts
 
       - name: Upload and publish
         env:
-          SSHPASS: ${{ secrets.VDS_PASSWORD }}
-          HOST: ${{ secrets.VDS_HOST }}
-          USER: ${{ secrets.VDS_USER }}
+          REL: ${{ github.sha }}
         run: |
           set -euo pipefail
-          SSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -o PubkeyAuthentication=no ${USER}@${HOST}"
-          echo "DNS centro-plus.ru -> $(getent hosts centro-plus.ru || echo 'not resolved')"
-          tar -C dist -czf - . | $SSH 'rm -rf /var/www/centro-plus.new && mkdir -p /var/www/centro-plus.new && tar -xzf - -C /var/www/centro-plus.new'
-          $SSH 'bash -s' < deploy/server-setup.sh
+          tar -C dist -czf - . | ssh deploy@$HOST "set -e
+            rm -rf /srv/centro-plus/releases/$REL && mkdir -p /srv/centro-plus/releases/$REL
+            tar -xzf - -C /srv/centro-plus/releases/$REL"
+          ssh deploy@$HOST 'bash -s' "$REL" < deploy/server-setup.sh
 
       - name: Check site
         run: |
-          sleep 5
+          sleep 3
           curl -sS -o /dev/null -w "https://centro-plus.ru -> %{http_code}\n" --max-time 30 https://centro-plus.ru/ || echo "HTTPS not ready yet (DNS or certificate) — see Caddy logs"
