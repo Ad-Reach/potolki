@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  HOST: 31.77.10.198
+  HOST: 185.196.117.71
 
 jobs:
   deploy:
@@ -28,6 +28,7 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           cp deploy/known_hosts ~/.ssh/known_hosts
+          printf 'Host 185.196.117.71\n  Port 1488\n' > ~/.ssh/config
 
       - name: Upload and publish
         env:
