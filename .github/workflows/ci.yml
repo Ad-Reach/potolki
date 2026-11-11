@@ -1,0 +1,53 @@
+name: CI / Deploy
+
+# PR — проверка сборки.
+# Пуш в main — сборка и публикация готового сайта (dist/) в ветку `site`.
+# Timeweb App Platform раздаёт ветку `site` и сам выкладывает каждый её коммит
+# (настройки приложения — репозиторий Ad-Reach/infra).
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 build.py
+      - name: Check output
+        run: |
+          test -f dist/index.html
+          echo "files: $(find dist -type f | wc -l)"
+
+      - name: Publish to branch site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          MSG: ${{ github.event.head_commit.message || 'manual run' }}
+        run: |
+          cd dist
+          git init -q -b site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Сборка ${GITHUB_SHA::7}: ${MSG%%$'\n'*}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" site
+
+      - name: Check live site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          sleep 60
+          curl -sS -o /dev/null -w "https://centro-plus.ru -> %{http_code}\n" --max-time 30 https://centro-plus.ru/ || echo "centro-plus.ru ещё не направлен на App Platform"
