@@ -89,6 +89,17 @@
     });
   }, { threshold: .12, rootMargin: '0px 0px -40px 0px' }) : null;
   $$('.rv,.geo').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
+  if (io) {
+    var pend = false;
+    var sweep = function () {
+      pend = false;
+      var left = $$('.rv:not(.in),.geo:not(.in)');
+      if (!left.length) { window.removeEventListener('scroll', onSweep); return; }
+      left.forEach(function (el) { if (el.getBoundingClientRect().bottom < 0) { el.classList.add('in'); io.unobserve(el); } });
+    };
+    var onSweep = function () { if (!pend) { pend = true; setTimeout(sweep, 200); } };
+    window.addEventListener('scroll', onSweep, { passive: true });
+  }
 
   /* stats: numbers count up once when visible */
   var cnts = $$('.cnt[data-n]');
@@ -152,11 +163,11 @@
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       var d;
       if (side) {
-        // rises through the gap between the columns, then turns right above the form's top edge
-        var g0 = l.right - c.left, g1 = f.left - c.left, gw = g1 - g0, top = f.top - c.top;
-        var x0 = g0 + gw * 0.2, xg = g0 + gw * 0.62, x1 = Math.min(g1 + Math.max(top * 3.2, 110), W - 40), yt = top + 6;
-        d = 'M' + x0 + ' ' + H + 'C' + (x0 + gw * 0.12) + ' ' + (H * 0.6) + ' ' + xg + ' ' + (yt + (H - yt) * 0.35) + ' ' + xg + ' ' + yt +
-            'C' + xg + ' ' + (yt * 0.45) + ' ' + (xg + (x1 - xg) * 0.35) + ' 0 ' + x1 + ' 0';
+        // one smooth curve: starts in the gap between the columns at the bottom edge,
+        // passes behind the (solid) form panel and leaves through the top edge
+        var g0 = l.right - c.left, g1 = f.left - c.left, gw = g1 - g0, fw = f.width;
+        var x0 = g0 + gw * 0.35, x1 = g1 + fw * 0.42;
+        d = 'M' + x0 + ' ' + H + 'C' + (x0 - gw * 0.1) + ' ' + (H * 0.45) + ' ' + (x0 + (x1 - x0) * 0.35) + ' ' + (H * 0.12) + ' ' + x1 + ' 0';
       } else {
         var a0 = W * 0.6, a1 = W * 0.95;
         d = 'M' + a0 + ' ' + H + 'C' + (a0 + 20) + ' ' + (H * 0.5) + ' ' + (a1 - 60) + ' ' + (H * 0.2) + ' ' + a1 + ' 0';

@@ -329,7 +329,7 @@ def home():
 
 def catalog_index():
     body = phero("Каталог натяжных потолков", "Фактуры, конструкции и освещение. Выберите вариант — покажем фото наших объектов, цены и преимущества.", "4613", [("Главная", "/"), ("Каталог", "")])
-    body += f'<section class="wrap sec"><div class="g4">{catalog_cards(TYPES)}</div></section>' + calc_block() + cta_block()
+    body += f'<section class="wrap sec"><div class="g4">{catalog_cards(TYPES)}</div></section>' + calc_block() + faq_block() + articles_block() + cta_block()
     page("/katalog/", f"Каталог натяжных потолков — {S['name']}", "Все виды натяжных потолков: матовые, глянцевые, сатиновые, тканевые, с подсветкой, теневые, парящие, бесщелевые и световые линии.", body)
 
 
@@ -349,6 +349,8 @@ def type_page(t):
 <section class="wrap sec"><h2 class="h2">Преимущества: {e(t["short"].lower())}</h2><div class="advs">{advs}</div></section>
 <section class="wrap sec"><h2 class="h2">Фото наших объектов</h2><div class="gallery">{gal}</div></section>
 <section class="wrap sec"><h2 class="h2">Другие решения</h2><div class="g4" style="margin-top:28px">{catalog_cards(others)}</div></section>
+{faq_block()}
+{articles_block()}
 {cta_block()}'''
     page(f"/katalog/{t['slug']}/", f"{t['name']} в Москве — цена за м² | {S['name']}", t["intro"][:160], body)
 
@@ -366,14 +368,14 @@ def works():
     body = phero("Наши работы", "Фотографии объектов, которые мы сделали в Москве и области: квартиры, дома, санузлы и коммерческие помещения.", "4638", [("Главная", "/"), ("Наши работы", "")])
     body += f'<section class="wrap sec"><h2 class="h2">Фотогалерея объектов</h2><div class="gallery">{gal}</div></section>'
     body += f'<section class="wrap sec"><div style="display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between"><h2 class="h2">Установим любой вид натяжного потолка</h2><p class="lead" style="max-width:460px">Расскажем об особенностях каждого варианта, чтобы вы сделали свой выбор.</p></div><div class="tabs" role="tablist" aria-label="Виды потолков">{tabs}</div>{panels}</section>'
-    body += cta_block()
+    body += faq_block() + articles_block() + cta_block()
     page("/raboty/", f"Наши работы — фото натяжных потолков | {S['name']}", "Фото выполненных работ: теневые, парящие, матовые потолки, световые линии и подсветка в Москве и области.", body)
 
 
 def promos():
     cards = "".join(f'<div class="promo {c} rv"><span class="big">{b}</span><b>{e(t)}</b><p>{e(d)}</p><a href="#" data-cb class="btn">Хочу также</a></div>' for b, t, d, c in PROMOS)
     body = phero("Акции", "Лучшие спецпредложения — установите натяжные потолки с выгодой.", "4589", [("Главная", "/"), ("Акции", "")])
-    body += f'<section class="wrap sec"><div class="promos">{cards}</div><p class="lead" style="margin-top:20px;font-size:14px">Условия акций уточняйте у менеджера. Акции не суммируются, если не указано иное.</p></section>' + calc_block() + cta_block()
+    body += f'<section class="wrap sec"><div class="promos">{cards}</div><p class="lead" style="margin-top:20px;font-size:14px">Условия акций уточняйте у менеджера. Акции не суммируются, если не указано иное.</p></section>' + calc_block() + faq_block() + articles_block() + cta_block()
     page("/akcii/", f"Акции на натяжные потолки — {S['name']}", "Скидки новосёлам и пенсионерам, светильники в подарок, рассрочка 0%, скидка в день замера.", body)
 
 
@@ -388,19 +390,19 @@ def about():
 <div class="split-c" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><img src="{img("4576")}" alt="" style="border-radius:16px;aspect-ratio:3/4;object-fit:cover;width:100%"><img src="{img("4661")}" alt="" style="border-radius:16px;aspect-ratio:3/4;object-fit:cover;width:100%;margin-top:40px"></div></section>
 <section class="wrap sec"><div class="stats" style="border:0;margin:0">{stats}</div></section>
 <section class="wrap sec"><h2 class="h2">Наши принципы</h2><div class="advs">{advs}</div></section>'''
-    body += cta_block() + contacts_block()
+    body += contacts_block() + faq_block() + articles_block() + cta_block()
     page("/o-kompanii/", f"О компании — {S['name']}", f"{S['name']}: натяжные потолки в Москве и области, {S['years']} лет опыта, {S['works']} выполненных работ, гарантия {S['warranty']}.", body)
 
 
 def contacts():
-    body = phero("Контакты", f"{S['address']}. {S['hours_calls']}.", "4628", [("Главная", "/"), ("Контакты", "")]) + contacts_block() + cta_block()
+    body = phero("Контакты", f"{S['address']}. {S['hours_calls']}.", "4628", [("Главная", "/"), ("Контакты", "")]) + contacts_block() + faq_block() + articles_block() + cta_block()
     page("/kontakty/", f"Контакты — {S['name']}", f"Телефон {S['phone']}, адрес: {S['address']}. WhatsApp и Telegram.", body)
 
 
 def articles():
     body = phero("Статьи", "Полезное о натяжных потолках: как выбрать, что учесть при ремонте и что делать в непредвиденных ситуациях.", "4620", [("Главная", "/"), ("Статьи", "")])
     cards = "".join(f'<a class="art" href="/stati/{a["slug"]}/"><img src="{img(a["img"], True)}" alt="" loading="lazy"><div><b>{e(a["title"])}</b><p>{e(a["sub"])}</p><span>Читать статью →</span></div></a>' for a in ARTICLES)
-    body += f'<section class="wrap sec"><div class="arts" style="margin:0">{cards}</div></section>' + cta_block()
+    body += f'<section class="wrap sec"><div class="arts" style="margin:0">{cards}</div></section>' + faq_block() + cta_block()
     page("/stati/", f"Статьи о натяжных потолках — {S['name']}", "Полезные статьи о натяжных потолках.", body)
     for a in ARTICLES:
         parts = ""
@@ -411,7 +413,7 @@ def articles():
                 parts += f"<{kind}>{e(val)}</{kind}>"
         b = phero(e(a["title"]), e(a["sub"]), a["img"], [("Главная", "/"), ("Статьи", "/stati/"), (a["title"], "")])
         b += f'<section class="wrap sec"><article class="prose">{parts}<p><a class="btn" href="#" data-cb>Задать вопрос мастеру {ARR}</a></p></article></section>'
-        b += articles_block("Другие статьи") + cta_block()
+        b += faq_block() + articles_block("Другие статьи") + cta_block()
         page(f"/stati/{a['slug']}/", f"{a['title']} — {S['name']}", a["sub"], b)
 
 

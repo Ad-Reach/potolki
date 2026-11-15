@@ -52,6 +52,8 @@ button{font:inherit}
 .mess:hover,.mess:focus-visible{color:#fff;transform:scale(1.12);filter:brightness(1.1);box-shadow:0 6px 16px rgba(0,0,0,.25)}
 .mess.wa{background:#2FB463}.mess.tg{background:#2AA3DE}.mess.max{background:linear-gradient(135deg,#4A6CF7,#9B4DFF)}
 .btn-cb{height:44px;padding:0 20px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.btn-cb{transition:background .2s,border-color .2s,color .2s}
+.btn-cb:hover,.btn-cb:focus-visible{background:var(--btn);border-color:var(--btn);color:var(--ink)}
 .burger{display:none;width:44px;height:44px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer}
 /* mega menu */
 .dd{position:static}
@@ -131,13 +133,15 @@ button{font:inherit}
 .calc-l p{color:#E2D8CE;max-width:460px}
 .calc-sum{display:flex;flex-direction:column;line-height:1.2}
 .calc-sum small{font-size:13px;color:#CFC3B8}.calc-sum b{font-size:30px;font-weight:700}
-.calc-f{position:relative;flex:1 1 380px;max-width:520px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px}
+.calc-f{position:relative;flex:1 1 380px;max-width:520px;background:#4A423E;border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:18px}
 .calc-f label,.calc-f .lbl{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:#E2D8CE}
 .calc-f label b{color:#fff;font-size:16px}
-.calc-f input[type=range]{width:100%;height:28px;accent-color:var(--accent)}
+.calc-f input[type=range]{width:100%;height:28px;accent-color:var(--btn)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font-size:14px;font-weight:600;height:42px;padding:0 16px;border-radius:22px;cursor:pointer;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
-.chip[aria-pressed=true]{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+.chip[aria-pressed=true]{background:var(--btn);color:var(--ink);border-color:var(--btn)}
+.chip{transition:background .2s,border-color .2s,color .2s}
+.chip:not([aria-pressed=true]):hover{border-color:var(--btn)}
 .calc-f select{font:inherit;font-size:15px;height:46px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:#4A413B;color:#fff;width:100%}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .num{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#4A413B;border-radius:12px;border:1px solid rgba(255,255,255,.22);height:46px;padding:0 6px}
@@ -330,7 +334,7 @@ button{font:inherit}
 .form label.f{flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#E2D8CE}
 .form input[type=text],.form input[type=tel]{font:inherit;font-size:15px;height:48px;padding:0 14px;border-radius:12px;border:0;background:#fff;color:var(--ink)}
 .form .agree{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:#D3C7BC;line-height:1.4}
-.form .agree input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.form .agree input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--btn);flex:none}
 .form .agree a{color:var(--accent)}
 .form .btn{justify-content:center}
 .form .ok{display:none;font-size:14px;color:var(--accent)}
@@ -398,7 +402,7 @@ button{font:inherit}
 /* catalog type page */
 .price-g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
 .pcard{background:#fff;border-radius:var(--r-card);padding:22px;display:flex;flex-direction:column;gap:10px;position:relative}
-.pcard .tag{position:absolute;top:16px;right:16px;font-size:11px;font-weight:700;letter-spacing:.06em;background:var(--accent2);color:#6B4A33;padding:4px 10px;border-radius:12px}
+.pcard .tag{position:absolute;top:16px;right:16px;font-size:11px;font-weight:700;letter-spacing:.06em;background:var(--btn);color:var(--ink);padding:4px 10px;border-radius:12px}
 .pcard b{font-size:18px}
 .pcard .pr{font-size:30px;font-weight:700}.pcard .pr small{font-size:14px;font-weight:600;color:var(--muted)}
 .pcard dl{margin:0;display:grid;grid-template-columns:auto auto;gap:4px 12px;font-size:13px;color:var(--ink2)}
