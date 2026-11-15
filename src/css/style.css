@@ -33,7 +33,7 @@ button{font:inherit}
 .hdr{position:fixed;inset:0 0 auto 0;z-index:50;color:#fff;transition:background .3s,color .3s,box-shadow .3s;
   background:rgba(43,37,33,.28);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border-bottom:1px solid rgba(255,255,255,.12)}
 .hdr.solid{background:#fff;color:var(--ink);box-shadow:0 4px 24px rgba(42,36,32,.08);border-bottom-color:transparent}
-.hdr-in{height:80px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.hdr-in{position:relative;height:80px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:none}
 .logo:hover{color:inherit}
 .logo .wm{display:block;line-height:0;margin-bottom:5px}
@@ -54,9 +54,11 @@ button{font:inherit}
 .btn-cb{height:44px;padding:0 20px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:600;font-size:14px;cursor:pointer}
 .burger{display:none;width:44px;height:44px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer}
 /* mega menu */
-.dd{position:relative}
-.mega{position:absolute;left:50%;top:100%;transform:translate(-30%,8px);width:min(1000px,92vw);background:#fff;color:var(--ink);border-radius:18px;box-shadow:0 24px 60px rgba(30,25,22,.18);padding:28px;display:grid;grid-template-columns:repeat(4,1fr) 220px;gap:24px;opacity:0;visibility:hidden;transition:.2s}
-.dd:hover .mega,.dd:focus-within .mega,.dd.open .mega{opacity:1;visibility:visible;transform:translate(-30%,0)}
+.dd{position:static}
+.mega{position:absolute;left:var(--pad);top:calc(100% + 12px);transform:translateY(8px);width:min(1000px,calc(100% - 2 * var(--pad)));background:#fff;color:var(--ink);border-radius:18px;box-shadow:0 24px 60px rgba(30,25,22,.18);padding:28px;display:grid;grid-template-columns:repeat(4,1fr) 220px;gap:24px;opacity:0;visibility:hidden;transition:.2s}
+.dd:hover .mega,.dd:focus-within .mega,.dd.open .mega{opacity:1;visibility:visible;transform:none}
+/* invisible bridge so the menu stays open while the pointer travels down from «Каталог» */
+.mega::before{content:"";position:absolute;left:0;right:0;top:-48px;height:48px}
 .mega h4{margin:0 0 10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brown)}
 .mega a{display:block;padding:5px 0;text-decoration:none;font-size:14px;color:var(--ink)}
 .mega a:hover{color:var(--brown)}

@@ -341,7 +341,7 @@ def type_page(t):
     gal = "".join(f'<a href="{img(p)}"><img src="{img(p, True)}" alt="{e(t["name"])} — фото объекта" loading="lazy"></a>' for p in t["photos"])
     pts = "".join(f"<li>{e(x)}</li>" for x in t["points"])
     others = [o for o in TYPES if o["slug"] != t["slug"]][:4]
-    body = f'''<section class="phero"><img class="bg" src="{img(t["photos"][0])}" alt=""><div class="wrap"><nav class="crumbs"><a href="/">Главная</a> / <a href="/katalog/">Каталог</a> / {e(t["short"])}</nav>
+    body = f'''<section class="phero"><img class="bg" src="{img(t.get("hero", t["photos"][0]))}" alt=""><div class="wrap"><nav class="crumbs"><a href="/">Главная</a> / <a href="/katalog/">Каталог</a> / {e(t["short"])}</nav>
 <h1 class="h1" style="font-size:clamp(34px,4.4vw,54px)">{e(t["name"])}</h1><p>{e(t["intro"])}</p><ul class="feat-list">{pts}</ul>
 <div class="hero-btns"><a href="#" data-cb class="btn">Заказать {ARR}</a><a href="#calc" class="btn btn-ghost">Рассчитать стоимость</a></div></div></section>
 {calc_block(t["canvas"], "Рассчитайте стоимость", e(t["short"]))}
