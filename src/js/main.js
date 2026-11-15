@@ -141,6 +141,34 @@
     document.addEventListener('click', function (e) { if (cur && !map.contains(e.target)) hide(); });
   });
 
+  /* calculator / cta arc: one smooth line from the bottom edge to the top edge,
+     placed in the gap between the text column and the form so it never crosses them */
+  $$('.calc').forEach(function (card) {
+    var svg = $('.calc-arc', card); if (!svg) return;
+    var L = $('.calc-l', card), F = $('.calc-f', card);
+    function draw() {
+      var c = card.getBoundingClientRect(), l = L.getBoundingClientRect(), f = F.getBoundingClientRect();
+      var W = c.width, H = c.height, side = f.top < l.bottom - 10; // columns side by side?
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var d;
+      if (side) {
+        // rises through the gap between the columns, then turns right above the form's top edge
+        var g0 = l.right - c.left, g1 = f.left - c.left, gw = g1 - g0, top = f.top - c.top;
+        var x0 = g0 + gw * 0.2, xg = g0 + gw * 0.62, x1 = Math.min(g1 + Math.max(top * 3.2, 110), W - 40), yt = top + 6;
+        d = 'M' + x0 + ' ' + H + 'C' + (x0 + gw * 0.12) + ' ' + (H * 0.6) + ' ' + xg + ' ' + (yt + (H - yt) * 0.35) + ' ' + xg + ' ' + yt +
+            'C' + xg + ' ' + (yt * 0.45) + ' ' + (xg + (x1 - xg) * 0.35) + ' 0 ' + x1 + ' 0';
+      } else {
+        var a0 = W * 0.6, a1 = W * 0.95;
+        d = 'M' + a0 + ' ' + H + 'C' + (a0 + 20) + ' ' + (H * 0.5) + ' ' + (a1 - 60) + ' ' + (H * 0.2) + ' ' + a1 + ' 0';
+      }
+      $('.ln', svg).setAttribute('d', d); $('.gl', svg).setAttribute('d', d);
+      $('.sh', svg).setAttribute('d', 'M0 ' + H + 'L' + d.slice(1) + 'L0 0Z');
+      svg.classList.toggle('soft', !side); svg.classList.add('on');
+    }
+    draw();
+    if ('ResizeObserver' in window) new ResizeObserver(draw).observe(card); else window.addEventListener('resize', draw);
+  });
+
   /* works: hovering a project row swaps the photo */
   $$('.works').forEach(function (w) {
     var ims = $$('.works-media img', w), rows = $$('.works-list a', w);
