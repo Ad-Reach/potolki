@@ -2,6 +2,7 @@
   --bg:#F4F2EF; --ink:#2A2420; --ink2:#5E544C; --muted:#6B6058;
   --dark:#2B2521; --dark2:#3A322D; --strip:#4A423C;
   --accent:#EBC9AB; --accent2:#F1DCC9; --line:#FBE6D2; --glow:#F3D3B4; --brown:#7A5A44; --rule:#DCD4CB;
+  --btn:#FFAB2A; --btn-hover:#FFB948;
   --r-card:16px; --r-plate:22px; --wrap:1360px; --pad:40px;
 }
 *{box-sizing:border-box}
@@ -18,11 +19,11 @@ button{font:inherit}
 .lead{color:var(--ink2)}
 .eyebrow{display:flex;align-items:center;gap:14px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brown);font-weight:700}
 .eyebrow::before{content:"";width:32px;height:1px;background:currentColor}
-.btn{height:54px;padding:0 26px;border-radius:28px;background:var(--accent);color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:12px;border:0;cursor:pointer;transition:filter .2s,transform .2s}
-.btn:hover{filter:brightness(1.05);color:var(--ink);transform:translateY(-1px)}
+.btn{height:54px;padding:0 26px;border-radius:28px;background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:12px;border:0;cursor:pointer;transition:filter .2s,transform .2s}
+.btn:hover{background:var(--btn-hover);color:var(--ink);transform:translateY(-1px);box-shadow:0 8px 22px rgba(255,171,42,.28)}
 .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff}
-.btn-ghost:hover{color:#fff;background:rgba(255,255,255,.08)}
-.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{color:#fff}
+.btn-ghost:hover{color:#fff;background:rgba(255,255,255,.08);box-shadow:none}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{color:#fff;background:var(--dark2);box-shadow:none}
 .btn-line{background:transparent;border:1px solid var(--ink);color:var(--ink)}
 .link-arrow{font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:12px;text-underline-offset:5px}
 .arr{width:18px;height:18px;flex:none}
@@ -44,7 +45,9 @@ button{font:inherit}
 .hdr-r{display:flex;align-items:center;gap:12px;flex:none}
 .tel{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-weight:700;font-size:15px}
 .tel:hover{color:inherit}
-.mess{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff}
+.mess{width:38px;height:38px;flex:none;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;transition:transform .2s ease,filter .2s ease,box-shadow .2s ease}
+.mess svg{display:block;flex:none}
+.mess:hover,.mess:focus-visible{color:#fff;transform:scale(1.12);filter:brightness(1.1);box-shadow:0 6px 16px rgba(0,0,0,.25)}
 .mess.wa{background:#2FB463}.mess.tg{background:#2AA3DE}.mess.max{background:linear-gradient(135deg,#4A6CF7,#9B4DFF)}
 .btn-cb{height:44px;padding:0 20px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;font-weight:600;font-size:14px;cursor:pointer}
 .burger{display:none;width:44px;height:44px;border-radius:22px;border:1px solid currentColor;background:transparent;color:inherit;align-items:center;justify-content:center;cursor:pointer}
@@ -78,6 +81,7 @@ button{font:inherit}
 .hero-in .eyebrow{color:#E9DFD5}
 .h1{font-size:clamp(38px,5vw,62px);line-height:1.06;font-weight:600;letter-spacing:-.02em;max-width:760px}
 .h1 em{font-style:normal;color:var(--accent)}
+@media (min-width:721px){.hero .h1 em{display:block}}
 .hero p{font-size:18px;color:#EDE5DD;max-width:580px}
 .hero-btns{display:flex;flex-wrap:wrap;gap:16px;margin-top:4px}
 .rates{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
@@ -85,11 +89,11 @@ button{font:inherit}
 .rate:hover{background:rgba(255,255,255,.2);color:#fff}
 .rate .ic{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
 .rate .star{color:#FFC94D}
-.hero-ctrl{position:absolute;z-index:3;right:var(--pad);bottom:34px;display:flex;align-items:center;gap:14px}
+.hero-ctrl{position:absolute;z-index:3;right:max(var(--pad),calc((100% - var(--wrap)) / 2 + var(--pad)));bottom:34px;display:flex;align-items:center;gap:14px}
 .hero-ctrl span{font-size:14px;font-weight:600;letter-spacing:.04em}
 .circ{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.15);color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .circ:hover{background:rgba(255,255,255,.15)}
-.hero-dots{position:absolute;z-index:3;left:var(--pad);bottom:40px;display:flex;gap:8px}
+.hero-dots{position:absolute;z-index:3;left:max(var(--pad),calc((100% - var(--wrap)) / 2 + var(--pad)));bottom:40px;display:flex;gap:8px}
 .hero-dots i{width:28px;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden;position:relative}
 .hero-dots i.on::after{content:"";position:absolute;inset:0;background:var(--accent);animation:dot var(--int,2s) linear forwards}
 @keyframes dot{from{transform:translateX(-100%)}to{transform:none}}
@@ -104,7 +108,8 @@ button{font:inherit}
 /* features strip */
 .feat{background:var(--strip);color:#F1E9E1}
 .feat .wrap{display:grid;grid-template-columns:repeat(5,1fr);padding-top:22px;padding-bottom:22px}
-.feat div{display:flex;align-items:center;gap:16px;padding:10px 20px;border-left:1px solid rgba(255,255,255,.14);font-size:13.5px;line-height:1.35}
+.feat .wrap>div{display:flex;align-items:center;gap:16px;padding:10px 20px;border-left:1px solid rgba(255,255,255,.14);font-size:13.5px;line-height:1.35}
+.feat .wrap>div:first-child{border-left:0;padding-left:0}
 .feat b{display:block;color:#fff;font-weight:600}
 .feat span{color:#D3C7BC}
 
@@ -362,6 +367,7 @@ button{font:inherit}
 @media (max-width:1180px){
   :root{--pad:28px}
   .feat .wrap{grid-template-columns:repeat(3,1fr)}
+  .feat .wrap>div:nth-child(3n+1){border-left:0;padding-left:0}
   .g4,.price-g,.advs,.arts,.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
   .why-grid{grid-template-columns:repeat(2,1fr)}
   .stats,.about-g{grid-template-columns:repeat(2,1fr)}
@@ -386,6 +392,7 @@ button{font:inherit}
   .hero-ctrl{right:20px;bottom:20px}.hero-dots{display:none}
   .hero-in{padding-bottom:100px}
   .marq img{height:180px}
+  .feat .wrap>div{border-left:0;padding-left:0}
   .row2{grid-template-columns:1fr}
   .tel span{display:none}
 }

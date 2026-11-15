@@ -10,8 +10,8 @@ e = html.escape
 ARR = '<svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>'
 ARR_L = '<svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>'
 PHONE_IC = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg>'
-WA_IC = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 1.8.8"/></svg>'
-TG_IC = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l8-6"/></svg>'
+WA_IC = '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round" d="M12 3.2a8.8 8.8 0 0 0-7.6 13.3L3.2 20.8l4.4-1.2A8.8 8.8 0 1 0 12 3.2z"/><path fill="#fff" d="M9.1 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 3 4.7 4.1 2.3.9 2.8.7 3.3.7.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.5-.3l-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.8-.7-1.3-1.5-1.4-1.8-.2-.3 0-.4.1-.5l.4-.5.3-.4c.1-.2 0-.3 0-.4l-.7-2z"/></svg>'
+TG_IC = '<svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M20.7 3.6 2.9 10.5c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.4c.2.6.4.8.8.8s.6-.2.9-.5l2.2-2.1 4.6 3.4c.8.5 1.5.2 1.7-.8l3-14.2c.3-1.2-.5-1.8-1.5-1.3zM9.3 13.6l8.4-5.3c.4-.2.7-.1.4.2l-6.9 6.2-.3 3.1-1.6-4.2z"/></svg>'
 MAX_IC = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><path d="M5 18V7l7 7 7-7v11"/></svg>'
 CHEV = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
 LOGO_SVG = '<svg width="42" height="42" viewBox="0 0 42 42" aria-hidden="true" fill="none" stroke="#E7C3A3" stroke-width="1.6"><rect x="1" y="1" width="40" height="40" rx="3"/><rect x="7" y="7" width="28" height="28" rx="2"/><path d="M13 13h16v16H13z"/><path d="M21 13v16M13 21h16"/></svg>'
@@ -192,7 +192,7 @@ def phero(title, sub, photo, crumbs):
 
 # ---------------- pages ----------------
 def home():
-    slides = "".join(f'<img {"src" if i == 0 else "data-src"}="{img(n)}" alt="Наш объект: натяжной потолок" {"fetchpriority=high" if i == 0 else ""}{" class=on" if i == 0 else ""}>' for i, n in enumerate(HERO))
+    slides = "".join(f'<img {"src" if i == 0 else "data-src"}="{img(n)}" alt="Натяжной потолок с подсветкой" {"fetchpriority=high" if i == 0 else ""}{" class=on" if i == 0 else ""}>' for i, n in enumerate(HERO))
     dots = "".join("<i></i>" for _ in HERO)
     feats = "".join(f'<div>{ic(p, 30, "#F1E9E1", 1.3)}<span style="display:block"><b>{t}</b><span>{s}</span></span></div>' for t, s, p in FEATURES)
     # why grid: adv, media, adv, adv(wide media)...
@@ -282,7 +282,7 @@ def works():
         panels += (f'<div class="tpanel" role="tabpanel" id="tp-{t["slug"]}" aria-labelledby="tab-{t["slug"]}"{"" if i == 0 else " hidden"}>'
                    f'<div class="gal"><div class="gal-main"><img src="{img(t["photos"][0])}" alt="{e(t["name"])}" loading="lazy"><button type="button" class="circ prev" aria-label="Назад">{ARR_L}</button><button type="button" class="circ next" aria-label="Вперёд">{ARR}</button></div><div class="thumbs">{th}</div></div>'
                    f'<div class="txt"><h3>{e(t["name"])}</h3><p class="lead">{e(t["intro"])}</p><a class="btn btn-line" href="/katalog/{t["slug"]}/">Подробнее {ARR}</a></div></div>')
-    allp = sorted({p for t in TYPES for p in t["photos"]} | set(MARQUEE) | set(HERO))
+    allp = sorted({p for t in TYPES for p in t["photos"]} | set(MARQUEE) | set(WORKS_EXTRA))
     gal = "".join(f'<a href="{img(p)}"><img src="{img(p, True)}" alt="Наш объект" loading="lazy"></a>' for p in allp)
     body = phero("Наши работы", "Фотографии объектов, которые мы сделали в Москве и области: квартиры, дома, санузлы и коммерческие помещения.", "4638", [("Главная", "/"), ("Наши работы", "")])
     body += f'<section class="wrap sec"><h2 class="h2">Фотогалерея объектов</h2><div class="gallery">{gal}</div></section>'
