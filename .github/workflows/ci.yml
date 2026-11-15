@@ -1,8 +1,8 @@
 name: CI
 
 # Проверка сборки на PR и пушах в main.
-# Деплой делает сам Timeweb App Platform: на каждый пуш в main он запускает
-# `python3 build.py` и раздаёт dist/ (настройки приложения — репозиторий Ad-Reach/infra).
+# Деплой делает сам Timeweb App Platform: на каждый пуш в main он раздаёт готовый dist/
+# из репозитория (настройки приложения — репозиторий Ad-Reach/infra).
 on:
   pull_request:
   push:
@@ -30,6 +30,13 @@ jobs:
         run: |
           test -f dist/index.html
           echo "files: $(find dist -type f | wc -l)"
+
+      # dist/ хранится в репозитории: App Platform видит готовый сайт и не собирает его
+      # (без установки Python выкладка быстрее). Он должен совпадать с исходниками.
+      - name: dist/ is up to date
+        run: |
+          git add -A dist
+          git diff --cached --quiet -- dist || { echo "::error::dist/ не совпадает с исходниками: запустите python3 build.py и закоммитьте dist/"; git diff --cached --stat -- dist | tail -20; exit 1; }
 
       - name: Check live site
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
