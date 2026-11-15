@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Собирает статический сайт в dist/. Запуск: python3 build.py"""
-import json, os, shutil, html
+import json, os, re, shutil, html
 from data import *
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +15,36 @@ TG_IC = '<svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><pat
 MAX_IC = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><path d="M5 18V7l7 7 7-7v11"/></svg>'
 CHEV = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
 LOGO_SVG = '<svg width="42" height="42" viewBox="0 0 42 42" aria-hidden="true" fill="none" stroke="#E7C3A3" stroke-width="1.6"><rect x="1" y="1" width="40" height="40" rx="3"/><rect x="7" y="7" width="28" height="28" rx="2"/><path d="M13 13h16v16H13z"/><path d="M21 13v16M13 21h16"/></svg>'
+
+
+STAT_ICONS = {
+    "years": "M7 3v3M17 3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM8 13h3M8 16h6",
+    "works": "M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9zM8 12.5l2.8 2.8L16.5 9.5",
+    "per_month": "M3 20h18M5 16l5-5 4 3 6-7M15 7h5v5",
+    "warranty": "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM9 12l2 2 4-4",
+}
+
+
+def stats_html():
+    """Цифры-преимущества: иконка + число, которое «набегает» (main.js) + подпись."""
+    out = []
+    for k, label in [("years", "лет опыта"), ("works", "выполненных работ"), ("per_month", "заказов в месяц"), ("warranty", "гарантия по договору")]:
+        v = S[k]
+        m = re.match(r"(\d+)(.*)", v)
+        num = f'<span class="cnt" data-n="{m.group(1)}" style="min-width:{len(m.group(1))}ch">{m.group(1)}</span>{e(m.group(2))}' if m else e(v)
+        out.append(f'<div><span class="st-ic">{ic(STAT_ICONS[k], 30, "currentColor", 1.6)}</span><b>{num}</b><span>{label}</span></div>')
+    return "".join(out)
+
+
+def works_block():
+    """Наши работы: тёмная плашка, слева фото, справа список проектов; наведение меняет фото."""
+    media = "".join(f'<img src="{img(p)}" alt="{e(t)}: {e(d)}" loading="lazy"{" class=on" if i == 0 else ""}>' for i, (t, d, p) in enumerate(PROJECTS))
+    rows = "".join(f'<li><a href="/raboty/" data-i="{i}"{" class=on" if i == 0 else ""}><img class="wl-th" src="{img(p, True)}" alt="" loading="lazy">'
+                   f'<span class="wl-n">{i + 1:02d}</span><span class="wl-t"><b>{e(t)}</b><span>{e(d)}</span></span><span class="wl-a">{ARR}</span></a></li>'
+                   for i, (t, d, p) in enumerate(PROJECTS))
+    return f'''<section id="works" class="wrap sec"><div class="works rv"><div class="works-media" aria-hidden="true">{media}</div>
+<div class="works-r"><span class="eyebrow">Портфолио</span><h2 class="h2">Наши работы</h2><p class="works-lead">Выполненные проекты: какие решения выбрали заказчики, как организовали свет и что вошло в монтаж.</p>
+<ol class="works-list">{rows}</ol><a class="btn" href="/raboty/">Смотреть все проекты {ARR}</a></div></div></section>'''
 
 
 def img(n, small=False):
@@ -206,10 +236,9 @@ def home():
         elif c.startswith("m"):
             n = WHY_MEDIA[mi % len(WHY_MEDIA)]; mi += 1
             cells.append(f'<div class="media kb{" wide" if c == "mw" else ""} rv"><img src="{img(n)}" alt="Наш объект" loading="lazy"></div>')
-    stats = "".join(f'<div><b>{v}</b><span>{l}</span></div>' for v, l in [(S["years"], "лет опыта"), (S["works"], "выполненных работ"), (S["per_month"], "заказов в месяц"), (S["warranty"], "гарантия по договору")])
+    stats = stats_html()
     steps = "".join(f'<li><span class="n">{i + 1:02d}</span><div><b>{t}</b><p>{d}</p></div></li>' for i, (t, d) in enumerate(STEPS))
     mq = "".join(f'<img src="{img(n, True)}" alt="" loading="lazy">' for n in MARQUEE)
-    projects = "".join(f'<a class="wcard" href="/raboty/"><img src="{img(p, True)}" alt="{e(s)}" loading="lazy"><span style="display:flex;flex-direction:column;gap:2px"><b>{t}</b><span>{s}</span></span></a>' for t, s, p in PROJECTS)
     body = f'''
 <section class="hero"><div class="hero-slides">{slides}</div>
 <div class="wrap hero-in"><span class="eyebrow">Натяжные потолки в Москве и МО</span>
@@ -223,7 +252,7 @@ def home():
 {calc_block()}
 <section id="catalog" class="wrap sec split"><div class="split-t"><h2 class="h2">Какой потолок вам подходит?</h2><p class="lead">Выберите фактуру или современную конструкцию — покажем особенности, фотографии и варианты исполнения.</p><a class="link-arrow" href="/katalog/">Смотреть весь каталог {ARR}</a></div>
 <div class="split-c g4">{catalog_cards([t for t in TYPES if t["slug"] in ("tenevye", "parjashchie", "matovye", "glyancevye")])}</div></section>
-<section id="works" class="wrap sec split"><div class="split-t"><h2 class="h2">Наши работы</h2><p class="lead">Выполненные проекты: какие решения выбрали заказчики, как организовали свет и что вошло в монтаж.</p><a class="link-arrow" href="/raboty/">Смотреть проекты {ARR}</a></div><div class="split-c g4">{projects}</div></section>
+{works_block()}
 <section class="wrap sec"><div style="display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between;margin-bottom:28px"><div><span class="eyebrow">Преимущества</span><h2 class="h2" style="margin-top:12px">Почему выбирают {S["name"]}</h2></div><p class="lead" style="max-width:480px">Работаем по Москве и области с 2010 года. Делаем аккуратно, по договору и с понятной сметой.</p></div>
 <div class="why-grid">{"".join(cells)}</div><div class="stats">{stats}</div></section>
 <section class="wrap sec"><div class="geo"><div><span class="eyebrow" style="color:var(--accent)">География</span><h2 class="h2" style="margin:12px 0 14px">Работаем по Москве и всей Московской области</h2>
@@ -299,7 +328,7 @@ def promos():
 
 
 def about():
-    stats = "".join(f'<div><b>{v}</b><span>{l}</span></div>' for v, l in [(S["years"], "лет опыта"), (S["works"], "выполненных работ"), (S["per_month"], "заказов в месяц"), (S["warranty"], "гарантия по договору")])
+    stats = stats_html()
     advs = "".join(f'<div class="rv"><b>{t}</b><p>{d}</p></div>' for t, d, p in WHY[:4])
     body = phero(f"О компании {S['name']}", "Натяжные потолки под ключ в Москве и Московской области. Уют. Качество. Надёжность.", "4608", [("Главная", "/"), ("О компании", "")])
     body += f'''<section class="wrap sec split"><div class="split-t" style="max-width:520px;flex-basis:420px"><h2 class="h2">Делаем потолки, которые создают атмосферу</h2>

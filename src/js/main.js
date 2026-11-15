@@ -67,11 +67,56 @@
     upd();
   });
 
-  /* reveal on scroll */
-  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
-    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: .15 }) : null;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* reveal on scroll: blocks and cards fade up once; cards in one row go one after another.
+     Only opacity/transform are animated, each element is observed once and then released. */
+  var vh0 = window.innerHeight;
+  $$('.sec .h2, .sec .lead, .sec .eyebrow, .ccard, .wcard, .adv, .media, .stats>div, .pcard, .advs>div, .rev, .art, .promo, .faq details, .gallery a, .steps li, .split-t .link-arrow')
+    .forEach(function (el) {
+      if (el.classList.contains('rv') || el.closest('.rv') || el.closest('.hero')) return;
+      if (el.getBoundingClientRect().top < vh0) return; // already on screen: no flash
+      el.classList.add('rv');
+    });
+  var io = 'IntersectionObserver' in window && !reduce ? new IntersectionObserver(function (es) {
+    var k = 0;
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var el = e.target;
+      el.style.setProperty('--d', Math.min(k++, 5) * 0.08 + 's');
+      el.classList.add('in'); io.unobserve(el);
+      setTimeout(function () { el.style.removeProperty('--d'); }, 1300); // hover must not wait for the stagger delay
+    });
+  }, { threshold: .12, rootMargin: '0px 0px -40px 0px' }) : null;
   $$('.rv,.geo').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
+
+  /* stats: numbers count up once when visible */
+  var cnts = $$('.stats .cnt');
+  if (cnts.length && io) {
+    var cio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target, n = +el.dataset.n, t0 = null; cio.unobserve(el);
+        requestAnimationFrame(function step(ts) {
+          if (t0 === null) t0 = ts;
+          var p = Math.min(1, (ts - t0) / 1500);
+          el.textContent = Math.round(n * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(step);
+        });
+      });
+    }, { threshold: .5 });
+    cnts.forEach(function (el) { if (el.getBoundingClientRect().top > vh0) { el.textContent = '0'; cio.observe(el); } });
+  }
+
+  /* works: hovering a project row swaps the photo */
+  $$('.works').forEach(function (w) {
+    var ims = $$('.works-media img', w), rows = $$('.works-list a', w);
+    function pick(i) {
+      rows.forEach(function (r, k) { r.classList.toggle('on', k === i); });
+      ims.forEach(function (im, k) { im.classList.toggle('on', k === i); });
+    }
+    rows.forEach(function (r, i) { r.addEventListener('mouseenter', function () { pick(i); }); r.addEventListener('focus', function () { pick(i); }); });
+  });
 
   /* steps progress bar fills while scrolling */
   var steps = $('.steps');
