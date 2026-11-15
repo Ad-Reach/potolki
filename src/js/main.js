@@ -91,7 +91,7 @@
   $$('.rv,.geo').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
 
   /* stats: numbers count up once when visible */
-  var cnts = $$('.stats .cnt');
+  var cnts = $$('.cnt[data-n]');
   if (cnts.length && io) {
     var cio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
@@ -107,6 +107,39 @@
     }, { threshold: .5 });
     cnts.forEach(function (el) { if (el.getBoundingClientRect().top > vh0) { el.textContent = '0'; cio.observe(el); } });
   }
+
+  /* geography: cities light up one by one in random order; tooltip on hover / tap */
+  $$('.geo').forEach(function (g) {
+    var cts = $$('.ct', g), map = $('.geo-map', g), tip = $('.geo-tip', g);
+    var order = cts.map(function (_, k) { return k; });
+    for (var j = order.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), t = order[j]; order[j] = order[r]; order[r] = t; }
+    order.forEach(function (ci, pos) {
+      var dl = (0.7 + pos * (3.2 / order.length) + Math.random() * 0.12).toFixed(2) + 's';
+      cts[ci].style.setProperty('--d', dl);
+      var ln = $('.ln[data-i="' + cts[ci].dataset.i + '"]', g); if (ln) ln.style.setProperty('--d', dl);
+    });
+    if (!tip || !map) return;
+    var cur = null;
+    function show(ct) {
+      if (cur) cur.classList.remove('act');
+      cur = ct; ct.classList.add('act');
+      var c = $('.c', ct).getBoundingClientRect(), m = map.getBoundingClientRect();
+      var x = c.left + c.width / 2 - m.left, y = c.top + c.height / 2 - m.top;
+      $('b', tip).textContent = ct.dataset.n;
+      tip.classList.toggle('left', x > m.width * 0.62);
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+      tip.classList.add('on');
+    }
+    function hide() { if (cur) cur.classList.remove('act'); cur = null; tip.classList.remove('on'); }
+    cts.forEach(function (ct) {
+      ct.addEventListener('mouseenter', function () { show(ct); });
+      ct.addEventListener('mouseleave', hide);
+      ct.addEventListener('focus', function () { show(ct); });
+      ct.addEventListener('blur', hide);
+      ct.addEventListener('click', function (e) { e.stopPropagation(); if (cur === ct) hide(); else show(ct); });
+    });
+    document.addEventListener('click', function (e) { if (cur && !map.contains(e.target)) hide(); });
+  });
 
   /* works: hovering a project row swaps the photo */
   $$('.works').forEach(function (w) {

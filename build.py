@@ -159,23 +159,64 @@ def catalog_cards(types):
                    f'<div><b>{e(t["short"])} {ARR}</b><span>{e(t["card"])}</span></div></a>' for t in types)
 
 
-def geo_svg():
-    k, lon0, lat0, cs = 260, 35.1, 56.98, 0.563
-    P = lambda lo, la: ((lo - lon0) * k * cs + 10, (lat0 - la) * k + 10)
-    outline = " ".join("%.1f,%.1f" % P(lo, la) for lo, la in MO_OUTLINE)
-    cx, cy = P(37.62, 55.75)
-    roads = "".join('<line class="road" x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f"/>' % (cx, cy, *P(lo, la)) for lo, la, n, b in GEO if b)
-    pts = ""
-    for i, (lo, la, n, big) in enumerate(GEO):
-        x, y = P(lo, la)
-        r = 6 if n == "Москва" else (4 if big else 3)
-        pts += (f'<g class="pt{" lbl" if big else ""}" style="--d:{(i % 16) * 0.18:.2f}s"><circle class="p" cx="{x:.1f}" cy="{y:.1f}" r="{r}"/>'
-                f'<circle class="c" cx="{x:.1f}" cy="{y:.1f}" r="{r}"/><text x="{x + 8:.1f}" y="{y + 3:.1f}">{e(n)}</text></g>')
-    return (f'<svg viewBox="0 0 770 720" role="img" aria-label="Карта: Москва и Московская область, города, где мы работаем">'
-            f'<defs><radialGradient id="gl"><stop offset="0" stop-color="#F3D3B4" stop-opacity=".35"/><stop offset="1" stop-color="#F3D3B4" stop-opacity="0"/></radialGradient></defs>'
-            f'<polygon class="mo" points="{outline}"/><circle cx="{cx:.1f}" cy="{cy:.1f}" r="140" fill="url(#gl)"/>{roads}'
-            f'<ellipse class="mkad" cx="{cx:.1f}" cy="{cy:.1f}" rx="{0.29 * k * cs:.1f}" ry="{0.17 * k:.1f}"/>{pts}</svg>')
+GEO_SHAPES = json.load(open(os.path.join(ROOT, "geo_shapes.json"), encoding="utf-8"))
+PIN_IC = "M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11zM12 12.3a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6z"
+CAR_IC = "M5 16h14M6.5 16v2.5M17.5 16v2.5M4 16v-3.5l2-5h12l2 5V16M4 12.5h16M7.5 13.8h.01M16.5 13.8h.01"
+CLOCK_IC = "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5V12l3 2"
 
+
+def geo_svg():
+    """Карта: реальные границы области и Москвы (OSM), город-хаб и все города; подсказка — в main.js."""
+    W, PAD, cs = 800, 16, 0.563
+    xs = [x for x, y in GEO_SHAPES["mo"]]
+    ys = [y for x, y in GEO_SHAPES["mo"]]
+    lon0, lat1 = min(xs), max(ys)
+    k = (W - 2 * PAD) / ((max(xs) - lon0) * cs)
+    H = round((lat1 - min(ys)) * k + 2 * PAD)
+    P = lambda lo, la: ((lo - lon0) * cs * k + PAD, (lat1 - la) * k + PAD)
+    d = lambda ring: "M" + "L".join("%.1f %.1f" % P(lo, la) for lo, la in ring) + "Z"
+    mo = d(GEO_SHAPES["mo"])
+    msk = "".join(d(r) for r in GEO_SHAPES["moscow"])
+    cx, cy = P(37.62, 55.75)
+    HUB_R = 27
+    lines, pts = "", ""
+    for i, (lo, la, n, big) in enumerate(c for c in GEO if c[2] != "Москва"):
+        x, y = P(lo, la)
+        if ((x - cx) ** 2 + (y - cy) ** 2) ** .5 < HUB_R + 7:
+            continue  # under the Moscow badge: covered by Moscow itself
+        if big:
+            # мягкая дуга от Москвы к крупному городу
+            mx, my = (cx + x) / 2, (cy + y) / 2
+            dx, dy = x - cx, y - cy
+            qx, qy = mx - dy * 0.18, my + dx * 0.18
+            lines += f'<path class="ln" pathLength="1" data-i="{i}" d="M{cx:.1f} {cy:.1f}Q{qx:.1f} {qy:.1f} {x:.1f} {y:.1f}"/>'
+        r = 4.2 if big else 3
+        west = x < cx - 4
+        lbl = (f'<text x="{x - 9 if west else x + 9:.1f}" y="{y - 7:.1f}"{" text-anchor=end" if west else ""}>{e(n)}</text>') if big else ""
+        pts += (f'<g class="ct{" big" if big else ""}" data-i="{i}" data-n="{e(n)}" tabindex="0" role="button" aria-label="{e(n)}: выезд на замер бесплатно">'
+                f'<circle class="h" cx="{x:.1f}" cy="{y:.1f}" r="{r * 3.2:.1f}"/><circle class="c" cx="{x:.1f}" cy="{y:.1f}" r="{r}"/>{lbl}</g>')
+    hub = (f'<g class="hub"><circle cx="{cx:.1f}" cy="{cy:.1f}" r="120" fill="url(#gHub)"/>'
+           f'<circle class="ring r2" cx="{cx:.1f}" cy="{cy:.1f}" r="74"/><circle class="ring r1" cx="{cx:.1f}" cy="{cy:.1f}" r="46"/>'
+           f'<circle class="core" cx="{cx:.1f}" cy="{cy:.1f}" r="{HUB_R}"/><text x="{cx:.1f}" y="{cy + 4.5:.1f}" text-anchor="middle">Москва</text></g>')
+    return (f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Карта: Москва и Московская область, города, где мы работаем">'
+            f'<defs><radialGradient id="gHub"><stop offset="0" stop-color="#FFB948" stop-opacity=".38"/><stop offset=".55" stop-color="#F3D3B4" stop-opacity=".10"/><stop offset="1" stop-color="#F3D3B4" stop-opacity="0"/></radialGradient>'
+            f'<radialGradient id="gPt"><stop offset="0" stop-color="#FFC56A" stop-opacity=".55"/><stop offset="1" stop-color="#FFC56A" stop-opacity="0"/></radialGradient>'
+            f'<linearGradient id="gLn" x1="0" x2="1"><stop offset="0" stop-color="#FFB948" stop-opacity=".7"/><stop offset="1" stop-color="#F3D3B4" stop-opacity=".25"/></linearGradient></defs>'
+            f'<path class="mo-glow" d="{mo}"/><path class="mo" d="{mo}"/><path class="msk" d="{msk}"/>'
+            f'<g class="lns">{lines}</g>{hub}<g class="cts">{pts}</g></svg>')
+
+
+def geo_block():
+    m = re.match(r"(\d+)(.*)", GEO_CITIES)
+    return f'''<section id="geo" class="wrap sec"><div class="geo">
+<div class="geo-l"><span class="eyebrow">География работ</span>
+<h2 class="h2">Устанавливаем потолки по всей <em>Москве и Подмосковью</em></h2>
+<p>Выезжаем на замер, помогаем подобрать решение и выполняем монтаж в Москве и городах Московской области.</p>
+<div class="geo-nums"><div><span class="gi">{ic(PIN_IC, 22, "currentColor", 1.6)}</span><span><b><span class="cnt" data-n="{m.group(1)}" style="min-width:{len(m.group(1))}ch">{m.group(1)}</span>{e(m.group(2))}</b><small>городов обслуживания</small></span></div>
+<div><span class="gi">{ic(CAR_IC, 22, "currentColor", 1.6)}</span><span><b>0 ₽</b><small>выезд на замер</small></span></div></div>
+<a href="#" data-cb class="btn">Проверить возможность замера {ARR}</a></div>
+<div class="geo-map">{geo_svg()}<div class="geo-tip" role="status" aria-live="polite"><b></b><span>{ic(CAR_IC, 16, "currentColor", 1.6)}Выезд на замер — 0 ₽</span><span>{ic(CLOCK_IC, 16, "currentColor", 1.6)}Монтаж от 1 дня</span></div></div>
+</div></section>'''
 
 def faq_block():
     items = "".join(f'<details><summary>{e(q)}<i aria-hidden="true">{CHEV}</i></summary><p>{e(a)}</p></details>' for q, a in FAQ)
@@ -252,14 +293,11 @@ def home():
 {calc_block()}
 <section id="catalog" class="wrap sec split"><div class="split-t"><h2 class="h2">Какой потолок вам подходит?</h2><p class="lead">Выберите фактуру или современную конструкцию — покажем особенности, фотографии и варианты исполнения.</p><a class="link-arrow" href="/katalog/">Смотреть весь каталог {ARR}</a></div>
 <div class="split-c g4">{catalog_cards([t for t in TYPES if t["slug"] in ("tenevye", "parjashchie", "matovye", "glyancevye")])}</div></section>
-{works_block()}
 <section class="wrap sec"><div style="display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between;margin-bottom:28px"><div><span class="eyebrow">Преимущества</span><h2 class="h2" style="margin-top:12px">Почему выбирают {S["name"]}</h2></div><p class="lead" style="max-width:480px">Работаем по Москве и области с 2010 года. Делаем аккуратно, по договору и с понятной сметой.</p></div>
 <div class="why-grid">{"".join(cells)}</div><div class="stats">{stats}</div></section>
-<section class="wrap sec"><div class="geo"><div><span class="eyebrow" style="color:var(--accent)">География</span><h2 class="h2" style="margin:12px 0 14px">Работаем по Москве и всей Московской области</h2>
-<p>Выезжаем на бесплатный замер и монтаж в любой район Москвы и практически во все города области.</p>
-<div class="geo-nums"><div><b>{len(GEO)}+</b><span>городов области</span></div><div><b>0 ₽</b><span>выезд на замер</span></div></div>
-<div class="geo-legend"><span><i class="m"></i>Москва — офис и склад</span><span><i></i>Города, где мы работаем</span></div></div>{geo_svg()}</div></section>
-<section class="wrap sec"><div class="about rv"><img src="{img("4608")}" alt="" loading="lazy"><div class="about-in"><div class="about-top"><div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow" style="color:var(--accent)">О компании</span><h2 class="h2" style="max-width:640px">{S["name"]} — натяжные потолки под ключ с {S["years"]} лет опыта</h2></div>
+{geo_block()}
+{works_block()}
+<section class="wrap sec"><div class="about rv"><img src="{img("about")}" alt="" loading="lazy"><div class="about-in"><div class="about-top"><div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow" style="color:var(--accent)">О компании</span><h2 class="h2" style="max-width:640px">{S["name"]} — натяжные потолки под ключ с {S["years"]} лет опыта</h2></div>
 <p>От замера до сдачи объекта: подбираем полотно и свет, делаем точную смету и чисто монтируем. Работаем только с сертифицированными материалами.</p></div>
 <div class="about-g"><div><b>С 2010 года</b><span>на рынке натяжных потолков Москвы и области</span></div><div><b>{S["works"]} объектов</b><span>квартиры, дома, офисы и коммерческие помещения</span></div><div><b>Свои бригады</b><span>опытные монтажники, чистый монтаж с пылесборником</span></div><div><b>Гарантия {S["warranty"]}</b><span>на полотно и монтаж — прописана в договоре</span></div></div>
 <a href="/o-kompanii/" class="btn" style="align-self:flex-start">О компании {ARR}</a></div></div></section>

@@ -195,27 +195,57 @@ button{font:inherit}
 .stats span{font-size:14px;color:var(--ink2)}
 
 /* geography */
-.geo{background:var(--dark);color:#fff;border-radius:var(--r-plate);overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:20px;padding:48px 56px;align-items:center}
-.geo p{color:#D8CEC4}
-.geo-legend{display:flex;flex-direction:column;gap:10px;margin-top:20px;font-size:14px;color:#E2D8CE}
-.geo-legend span{display:flex;align-items:center;gap:10px}
-.geo-legend i{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--glow)}
-.geo-legend i.m{background:#fff}
-.geo-nums{display:flex;gap:32px;margin-top:24px}
-.geo-nums b{display:block;font-size:34px;font-weight:600;color:var(--accent)}
-.geo-nums span{font-size:13px;color:#BFB3A8}
-.geo svg{width:100%;height:auto;overflow:visible}
-.geo .mo{fill:rgba(255,255,255,.04);stroke:rgba(235,201,171,.35);stroke-width:1.2}
-.geo .mkad{fill:rgba(235,201,171,.12);stroke:var(--accent);stroke-width:1.5}
-.geo .road{stroke:rgba(255,255,255,.08);stroke-width:1}
-.geo .pt circle.c{fill:var(--accent)}
-.geo .pt circle.p{fill:none;stroke:var(--accent);stroke-width:1.2;transform-box:fill-box;transform-origin:center;animation:ping 3s ease-out infinite;animation-delay:var(--d)}
-.geo .pt text{fill:#CFC3B8;font-size:10px;font-family:inherit;opacity:0;transition:opacity .3s}
-.geo .pt:hover text,.geo .pt.lbl text{opacity:1}
-.geo .pt{opacity:0}
-.geo.in .pt{animation:pop .5s ease forwards;animation-delay:var(--d)}
-@keyframes pop{from{opacity:0}to{opacity:1}}
-@keyframes ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+.geo{position:relative;background:radial-gradient(120% 90% at 75% 45%,#3A2F27 0%,var(--dark) 55%,#221D1A 100%);color:#fff;border-radius:var(--r-plate);overflow:hidden;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:24px;padding:56px;align-items:center}
+.geo-l{display:flex;flex-direction:column;gap:22px;align-items:flex-start}
+.geo-l .eyebrow{color:var(--accent)}
+.geo-l .h2{font-size:clamp(30px,3.4vw,44px);line-height:1.1}
+.geo-l .h2 em{font-style:normal;color:var(--accent)}
+.geo-l p{color:#D8CEC4;max-width:460px}
+.geo-nums{display:flex;flex-wrap:wrap;gap:20px 0;margin:4px 0 6px}
+.geo-nums>div{display:flex;align-items:flex-start;gap:14px;padding-right:28px}
+.geo-nums>div+div{padding-left:28px;padding-right:0;border-left:1px solid rgba(255,255,255,.14)}
+.geo-nums .gi{width:48px;height:48px;flex:none;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--btn);background:rgba(255,171,42,.1);border:1px solid rgba(255,171,42,.28)}
+.geo-nums b{display:block;font-size:34px;font-weight:600;line-height:1.05;font-variant-numeric:tabular-nums}
+.geo-nums b .cnt{display:inline-block;text-align:right}
+.geo-nums small{display:block;font-size:14px;color:#CFC3B8;margin-top:4px;max-width:130px;line-height:1.3}
+
+.geo-map{position:relative}
+.geo-map>svg{display:block;width:100%;height:auto;overflow:visible}
+.geo .mo{fill:rgba(255,255,255,.035);stroke:rgba(243,211,180,.6);stroke-width:1.2;stroke-linejoin:round}
+.geo .mo-glow{fill:none;stroke:rgba(255,185,72,.13);stroke-width:9;stroke-linejoin:round}
+.geo .msk{fill:rgba(255,185,72,.09);stroke:rgba(255,185,72,.55);stroke-width:1;stroke-dasharray:3 3}
+.geo .ln{fill:none;stroke:url(#gLn);stroke-width:1.2;stroke-dasharray:1;stroke-dashoffset:1}
+.geo .hub,.geo .lns{pointer-events:none}
+.geo .hub .ring{fill:none;stroke:rgba(243,211,180,.16);stroke-width:1}
+.geo .hub .core{fill:#2B2521;stroke:#FFB948;stroke-width:1.5}
+.geo .hub text{fill:#fff;font-size:12.5px;font-weight:700;font-family:inherit}
+.geo .ct{cursor:pointer;outline:none}
+.geo .ct .h{fill:url(#gPt);opacity:.75;transition:opacity .25s}
+.geo .ct .c{fill:#FFD9A3;stroke:#FFB948;stroke-width:1.2;transform-box:fill-box;transform-origin:center;transition:transform .25s cubic-bezier(.2,.9,.3,1.4),fill .25s}
+.geo .ct text{fill:#E9DFD5;font-size:12.5px;font-weight:500;font-family:inherit;pointer-events:none}
+.geo .ct:hover .c,.geo .ct:focus-visible .c,.geo .ct.act .c{transform:scale(1.7);fill:#fff}
+.geo .ct:hover .h,.geo .ct.act .h{opacity:1}
+
+/* appearance: outline and Moscow first, then cities light up one by one in random order (delays from main.js) */
+.geo .mo,.geo .mo-glow,.geo .msk,.geo .hub{opacity:0;transition:opacity 1s ease}
+.geo .ct{opacity:0}
+.geo.in .mo,.geo.in .mo-glow,.geo.in .msk,.geo.in .hub{opacity:1}
+.geo.in .ct{animation:ctIn .6s cubic-bezier(.2,.9,.3,1.3) var(--d,0s) both}
+.geo.in .ln{animation:lnDraw 1.1s ease var(--d,0s) forwards}
+.geo.in .hub .r1{animation:hubPulse 4s ease-in-out 1s infinite}
+@keyframes ctIn{0%{opacity:0;transform:scale(.2)}100%{opacity:1;transform:none}}
+.geo .ct{transform-box:fill-box;transform-origin:center}
+@keyframes lnDraw{to{stroke-dashoffset:0}}
+@keyframes hubPulse{0%,100%{stroke:rgba(243,211,180,.16)}50%{stroke:rgba(255,185,72,.5)}}
+
+/* tooltip */
+.geo-tip{position:absolute;left:0;top:0;z-index:2;min-width:200px;padding:14px 16px;border-radius:14px;background:rgba(43,37,33,.86);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(243,211,180,.28);box-shadow:0 14px 36px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:#E2D8CE;pointer-events:none;opacity:0;transform:translate(16px,-50%) scale(.96);transform-origin:left center;transition:opacity .18s ease,transform .18s ease}
+.geo-tip.on{opacity:1;transform:translate(16px,-50%)}
+.geo-tip.left{transform:translate(calc(-100% - 16px),-50%) scale(.96);transform-origin:right center}
+.geo-tip.left.on{transform:translate(calc(-100% - 16px),-50%)}
+.geo-tip b{font-size:16px;color:#fff;font-weight:600}
+.geo-tip span{display:flex;align-items:center;gap:8px}
+.geo-tip svg{color:var(--accent);flex:none}
 
 /* about block */
 .about{position:relative;border-radius:var(--r-plate);overflow:hidden;color:#fff;background:var(--dark)}
@@ -409,7 +439,8 @@ button{font:inherit}
   .why-grid{grid-template-columns:repeat(2,1fr)}
   .stats,.about-g{grid-template-columns:repeat(2,1fr)}
   .stats div:nth-child(3){border-left:0}
-  .geo,.cont,.tpanel{grid-template-columns:1fr}
+  .geo,.cont,.tpanel{grid-template-columns:minmax(0,1fr)}
+  .geo{padding:44px 40px}
   .works{grid-template-columns:minmax(0,1fr)}.works-media{min-height:340px}.works-r{padding:40px}
   .revs,.promos{grid-template-columns:repeat(2,1fr)}
   .steps{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto;padding-bottom:8px}
@@ -421,6 +452,10 @@ button{font:inherit}
   .gallery{grid-template-columns:repeat(2,1fr)}
   .media.wide{grid-column:auto}.media{min-height:220px}
   .calc,.cta,.geo,.about-in{padding:28px 22px}
+  .geo-nums>div{padding-right:18px}.geo-nums>div+div{padding-left:18px}
+  .geo-nums b{font-size:28px}
+  .geo .ct text{font-size:22px}.geo .hub text{font-size:17px}
+  .geo-nums{flex-direction:column;gap:16px}.geo-nums>div,.geo-nums>div+div{padding:0;border:0}
   .cont-l{padding:26px}
   .stats{grid-template-columns:1fr 1fr}
   .steps{grid-template-columns:1fr;overflow:visible}
@@ -446,5 +481,6 @@ button{font:inherit}
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important}
   .rv{opacity:1;transform:none}
-  .geo .pt{opacity:1}
+  .geo .ct,.geo .mo,.geo .mo-glow,.geo .msk,.geo .hub{opacity:1}
+  .geo .ln{stroke-dashoffset:0}
 }
