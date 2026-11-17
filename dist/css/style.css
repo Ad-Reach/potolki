@@ -147,6 +147,7 @@ button{font:inherit}
 .num{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#4A413B;border-radius:12px;border:1px solid rgba(255,255,255,.22);height:46px;padding:0 6px}
 .num button{width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:18px}
 .num output{font-weight:700}
+.calc-from{font-size:15px;font-weight:600;color:#fff}
 .calc-note{font-size:13px;color:#CFC3B8;line-height:1.45}
 
 /* catalog cards */
@@ -160,7 +161,7 @@ button{font:inherit}
 .ccard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,26,23,0) 40%,rgba(30,26,23,.85) 100%)}
 .ccard div{position:absolute;z-index:1;left:20px;right:20px;bottom:20px;display:flex;flex-direction:column;gap:6px}
 .ccard b{font-size:20px;font-weight:600;line-height:1.15;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
-.ccard span{font-size:13.5px;color:#E6DDD4;line-height:1.4}
+.ccard span{font-size:13.5px;color:#E6DDD4;line-height:1.4;min-height:2.8em}
 .ccard:hover{color:#fff}
 .wcard{display:flex;flex-direction:column;gap:12px;text-decoration:none;color:var(--ink)}
 .wcard img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px}

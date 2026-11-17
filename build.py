@@ -163,7 +163,7 @@ def calc_block(canvas="mat", title="Узнайте ориентировочну�
 <div><span class="lbl">Тип полотна</span><div class="chips" style="margin-top:10px">{chips}</div></div>
 <div class="row2"><div><label for="c-prof-{canvas}">Профиль</label><select id="c-prof-{canvas}" name="profile" style="margin-top:8px">{opts}</select></div>
 <div><span class="lbl">Светильники, шт</span><div class="num" data-k="lamps" style="margin-top:8px"><button type="button" data-d="-1" aria-label="Меньше">−</button><output>4</output><button type="button" data-d="1" aria-label="Больше">+</button></div></div></div>
-<p class="calc-note"></p></div></div></section>'''
+<p class="calc-note"></p><p class="calc-from">от 25 000 ₽</p></div></div></section>'''
 
 
 def catalog_cards(types):
