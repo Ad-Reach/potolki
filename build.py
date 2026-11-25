@@ -364,7 +364,7 @@ def works():
         panels += (f'<div class="tpanel" role="tabpanel" id="tp-{t["slug"]}" aria-labelledby="tab-{t["slug"]}"{"" if i == 0 else " hidden"}>'
                    f'<div class="gal"><div class="gal-main"><img src="{img(t["photos"][0])}" alt="{e(t["name"])}" loading="lazy"><button type="button" class="circ prev" aria-label="Назад">{ARR_L}</button><button type="button" class="circ next" aria-label="Вперёд">{ARR}</button></div><div class="thumbs">{th}</div></div>'
                    f'<div class="txt"><h3>{e(t["name"])}</h3><p class="lead">{e(t["intro"])}</p><a class="btn btn-line" href="/katalog/{t["slug"]}/">Подробнее {ARR}</a></div></div>')
-    allp = sorted({p for t in TYPES for p in t["photos"]} | set(MARQUEE) | set(WORKS_EXTRA))
+    allp = WORKS_NEW + sorted(({p for t in TYPES for p in t["photos"]} | set(MARQUEE) | set(WORKS_EXTRA)) - set(WORKS_NEW))
     gal = "".join(f'<a href="{img(p)}"><img src="{img(p, True)}" alt="Наш объект" loading="lazy"></a>' for p in allp)
     body = phero("Наши работы", "Фотографии объектов, которые мы сделали в Москве и области: квартиры, дома, санузлы и коммерческие помещения.", "4638", [("Главная", "/"), ("Наши работы", "")])
     body += f'<section class="wrap sec"><h2 class="h2">Фотогалерея объектов</h2><div class="gallery">{gal}</div></section>'
