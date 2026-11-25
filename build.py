@@ -238,8 +238,9 @@ def faq_block():
 <div class="faq">{col(left)}{col(right)}</div></section>'''
 
 
-def articles_block(title="Полезные статьи"):
-    cards = "".join(f'<a class="art" href="/stati/{a["slug"]}/"><img src="{img(a["img"], True)}" alt="" loading="lazy"><div><b>{e(a["title"])}</b><p>{e(a["sub"])}</p><span>Читать статью →</span></div></a>' for a in ARTICLES)
+def articles_block(title="Полезные статьи", items=None):
+    items = ARTICLES[:4] if items is None else items
+    cards = "".join(f'<a class="art" href="/stati/{a["slug"]}/"><img src="{img(a["img"], True)}" alt="" loading="lazy"><div><b>{e(a["title"])}</b><p>{e(a["sub"])}</p><span>Читать статью →</span></div></a>' for a in items)
     return f'''<section class="wrap sec"><div style="display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between"><h2 class="h2">{title}</h2><a class="link-arrow" href="/stati/">Все статьи {ARR}</a></div><div class="arts">{cards}</div></section>'''
 
 
@@ -404,17 +405,28 @@ def articles():
     cards = "".join(f'<a class="art" href="/stati/{a["slug"]}/"><img src="{img(a["img"], True)}" alt="" loading="lazy"><div><b>{e(a["title"])}</b><p>{e(a["sub"])}</p><span>Читать статью →</span></div></a>' for a in ARTICLES)
     body += f'<section class="wrap sec"><div class="arts" style="margin:0">{cards}</div></section>' + faq_block() + cta_block()
     page("/stati/", f"Статьи о натяжных потолках — {S['name']}", "Полезные статьи о натяжных потолках.", body)
-    for a in ARTICLES:
+    for n, a in enumerate(ARTICLES):
         parts = ""
         for kind, val in a["body"]:
             if kind == "ul":
                 parts += "<ul>" + "".join(f"<li>{e(x)}</li>" for x in val) + "</ul>"
+            elif kind == "img":
+                ph, alt = a["photos"][val]
+                parts += f'<img src="{img(ph)}" alt="{e(alt)}" loading="lazy" width="1200" height="800">'
             else:
                 parts += f"<{kind}>{e(val)}</{kind}>"
+        if a.get("faq"):
+            parts += '<h2>Частые вопросы</h2><div class="afaq">' + "".join(f'<details><summary>{e(q)}<i aria-hidden="true">{CHEV}</i></summary><p>{e(t)}</p></details>' for q, t in a["faq"]) + "</div>"
+        if a.get("cta"):
+            lk = f'<a class="link-arrow" href="{a["link"][1]}">{e(a["link"][0])} {ARR}</a>' if a.get("link") else ""
+            parts += f'<div class="acta"><h2>{e(a["cta"][0])}</h2><p>{e(a["cta"][1])}</p><div class="acta-r"><a class="btn" href="#" data-cb>Получить консультацию {ARR}</a>{lk}</div></div>'
+        else:
+            parts += f'<p><a class="btn" href="#" data-cb>Задать вопрос мастеру {ARR}</a></p>'
         b = phero(e(a["title"]), e(a["sub"]), a["img"], [("Главная", "/"), ("Статьи", "/stati/"), (a["title"], "")])
-        b += f'<section class="wrap sec"><article class="prose">{parts}<p><a class="btn" href="#" data-cb>Задать вопрос мастеру {ARR}</a></p></article></section>'
-        b += faq_block() + articles_block("Другие статьи") + cta_block()
-        page(f"/stati/{a['slug']}/", f"{a['title']} — {S['name']}", a["sub"], b)
+        b += f'<section class="wrap sec"><article class="prose">{parts}</article></section>'
+        others = [ARTICLES[(n + k) % len(ARTICLES)] for k in range(1, 4)]
+        b += articles_block("Другие статьи", others) + cta_block()
+        page(f"/stati/{a['slug']}/", a.get("meta_title") or f"{a['title']} — {S['name']}", a["sub"], b)
 
 
 def policy():

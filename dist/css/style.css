@@ -500,3 +500,18 @@ button{font:inherit}
   .geo .ct,.geo .mo,.geo .mo-glow,.geo .msk,.geo .hub{opacity:1}
   .geo .ln{stroke-dashoffset:0}
 }
+
+/* article pages */
+.prose h3{font-size:19px;margin:24px 0 8px}
+.prose img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+.afaq{display:flex;flex-direction:column;gap:12px;margin:0 0 24px}
+.afaq details{background:#fff;border-radius:14px}
+.afaq summary{list-style:none;cursor:pointer;min-height:58px;padding:16px 18px 16px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:600;font-size:16px}
+.afaq summary::-webkit-details-marker{display:none}
+.afaq summary i{flex:none;width:34px;height:34px;border-radius:10px;background:var(--btn);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;transition:transform .25s,background .25s,color .25s}
+.afaq details[open] summary i{transform:rotate(180deg);background:var(--brown);color:#fff}
+.afaq details p{padding:0 22px 20px;margin:0;color:var(--ink2);font-size:15px}
+.acta{margin-top:36px;padding:28px;border-radius:20px;background:#fff}
+.acta h2{margin:0 0 10px}
+.acta-r{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center}
+.acta-r p{margin:0}
